@@ -32,6 +32,7 @@ const (
 	OutBin = "main"
 	// BuildDirEnv is an environment variable that buildpacks can use to communicate the working directory to `go build`.
 	BuildDirEnv = "GOOGLE_INTERNAL_BUILD_DIR"
+	AlternativeUserNetwork = "alternative_user_network"
 )
 
 var (
@@ -160,7 +161,13 @@ var readGoMod = func(ctx *gcp.Context) string {
 // For newer versions of Go, we take advantage of the "pipe" character which has the same effect.
 func ExecWithGoproxyFallback(ctx *gcp.Context, cmd []string, opts ...gcp.ExecOption) *gcp.ExecResult {
 	if SupportsGoProxyFallback(ctx) {
-		opts = append(opts, gcp.WithEnv("GOPROXY=https://proxy.golang.org|direct"))
+		var goProxy string
+		if userNetwork := DetectNetwork(ctx); userNetwork == AlternativeUserNetwork {
+			goProxy = "GOPROXY=https://goproxy.cn,direct"
+		} else {
+			goProxy = "GOPROXY=https://proxy.golang.org|direct"
+		}
+		opts = append(opts, gcp.WithEnv(goProxy))
 		return ctx.Exec(cmd, opts...)
 	}
 
@@ -172,4 +179,13 @@ func ExecWithGoproxyFallback(ctx *gcp.Context, cmd []string, opts ...gcp.ExecOpt
 
 	opts = append(opts, gcp.WithEnv("GOSUMDB=off", "GOPROXY=direct"))
 	return ctx.Exec(cmd, opts...)
+}
+
+// DetectNetwork help to choose the appropriate go resource download url according to the user's network.
+func DetectNetwork(ctx *gcp.Context) string {
+	if _, err := ctx.ExecWithErr([]string{"curl", "--connect-timeout", "1", "--silent", "https://googleapis.com"}, gcp.WithUserAttribution); err != nil {
+		return AlternativeUserNetwork
+	} else {
+		return ""
+	}
 }
