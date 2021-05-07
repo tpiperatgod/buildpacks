@@ -44,7 +44,7 @@ const (
 	// Entrypoint is an env var used to override the default entrypoint.
 	// Entrypoint should be respected by at least one buildpack in builders that are not product-specific.
 	// Example: `gunicorn -p :8080 main:app` for Python.
-	Entrypoint = "GOOGLE_ENTRYPOINT"
+	Entrypoint = "FUNC_ENTRY"
 
 	// ClearSource is an env var used to clear source files from the final image.
 	// Buildpacks for Go and Java support clearing the source.
@@ -70,21 +70,21 @@ const (
 	// FunctionTarget is an env var used to specify function name.
 	// FunctionTarget must be respected by all functions-framework buildpacks.
 	// Example: `helloWorld` or any exported function name.
-	FunctionTarget = "GOOGLE_FUNCTION_TARGET"
+	FunctionTarget = "FUNC_NAME"
 	// FunctionTargetLaunch is a launch time version of FunctionTarget.
 	FunctionTargetLaunch = "FUNCTION_TARGET"
 
 	// FunctionSource is an env var used to specify function source location.
 	// FunctionSource must be respected by all functions-framework buildpacks.
 	// Example: `./path/to/source` will build the function at the specfied path.
-	FunctionSource = "GOOGLE_FUNCTION_SOURCE"
+	FunctionSource = "FUNC_SRC"
 	// FunctionSourceLaunch is a launch time version of FunctionSource.
 	FunctionSourceLaunch = "FUNCTION_SOURCE"
 
 	// FunctionSignatureType is an env var used to specify function signature type.
 	// FunctionSignatureType must be respected by all functions-framework buildpacks.
 	// Example: `http` for HTTP-triggered functions or `event` for event-triggered functions.
-	FunctionSignatureType = "GOOGLE_FUNCTION_SIGNATURE_TYPE"
+	FunctionSignatureType = "FUNC_TYPE"
 	// FunctionSignatureTypeLaunch is a launch time version of FunctionSignatureType.
 	FunctionSignatureTypeLaunch = "FUNCTION_SIGNATURE_TYPE"
 
@@ -104,7 +104,7 @@ const (
 	// label key. For example, "GOOGLE_LABEL_ABC=Some-Value" will result in a
 	// label on the final container of "abc=Some-Value". The label key itself is
 	// lowercased, underscores changed to dashes, and is prefixed with "google.".
-	LabelPrefix = "GOOGLE_LABEL_"
+	LabelPrefix = "LABEL_"
 )
 
 // IsDebugMode returns true if the buildpack debug mode is enabled.
